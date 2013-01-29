@@ -78,6 +78,7 @@ public class CopyTagsPortlet extends GenericPortlet {
 
 			updateAssetCategories();
 			updateAssetTags();
+			rebuildTree();
 
 			_log.warn("Copying Tags completed");
 
@@ -535,6 +536,33 @@ public class CopyTagsPortlet extends GenericPortlet {
 				serviceComponent);
 		} catch (Exception e) {
 			throw new PortletException(e);
+		}
+	}
+
+	private void rebuildTree() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+					"select distinct groupId from AssetCategory where " +
+							"(leftCategoryId is null) or (rightCategoryId is null)");
+
+			rs = ps.executeQuery();
+
+			_log.warn("Rebuilding AssetCategory tree");
+
+			while (rs.next()) {
+				long groupId = rs.getLong("groupId");
+
+				AssetCategoryLocalServiceUtil.rebuildTree(groupId, true);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 
