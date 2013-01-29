@@ -548,8 +548,8 @@ public class CopyTagsPortlet extends GenericPortlet {
 			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
-					"select distinct groupId from AssetCategory where " +
-							"(leftCategoryId is null) or (rightCategoryId is null)");
+				"select distinct groupId from AssetCategory where " +
+					"(leftCategoryId is null) or (rightCategoryId is null)");
 
 			rs = ps.executeQuery();
 
